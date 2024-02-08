@@ -9,8 +9,8 @@ Gem::Specification.new do |spec|
   spec.version       = ComposeCompilerMetrics::VERSION
   spec.authors       = ["Tomoki Yamashita"]
   spec.email         = ["tomorrowkey@gmail.com"]
-  spec.description   = "A short description of danger-compose_compiler_metrics."
-  spec.summary       = "A longer description of danger-compose_compiler_metrics."
+  spec.description   = "Report compose compiler metrics"
+  spec.summary       = "Report compose compiler metrics"
   spec.homepage      = "https://github.com/tomorrowkey/danger-compose_compiler_metrics"
   spec.license       = "MIT"
 
