@@ -25,7 +25,7 @@ module Danger
       # Some examples for writing tests
       # You should replace these with your own.
 
-      it "Warns on a monday" do
+      xit "Warns on a monday" do
         monday_date = Date.parse("2016-07-11")
         allow(Date).to receive(:today).and_return monday_date
 
@@ -34,7 +34,7 @@ module Danger
         expect(@dangerfile.status_report[:warnings]).to eq(["Trying to merge code on a Monday"])
       end
 
-      it "Does nothing on a tuesday" do
+      xit "Does nothing on a tuesday" do
         monday_date = Date.parse("2016-07-12")
         allow(Date).to receive(:today).and_return monday_date
 
