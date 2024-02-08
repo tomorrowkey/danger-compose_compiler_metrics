@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["tomorrowkey@gmail.com"]
   spec.description   = "A short description of danger-compose_compiler_metrics."
   spec.summary       = "A longer description of danger-compose_compiler_metrics."
-  spec.homepage      = "https://github.com/Tomoki Yamashita/danger-compose_compiler_metrics"
+  spec.homepage      = "https://github.com/tomorrowkey/danger-compose_compiler_metrics"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
