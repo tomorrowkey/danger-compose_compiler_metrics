@@ -37,6 +37,16 @@ module Danger
     end
 
     def report_file_difference(title, metrics_path, base_metrics_path)
+      unless File.exist?(metrics_path)
+        warn "DangerComposeCompilerMetrics: new file not found at #{metrics_path}. Skipping file difference report."
+        return
+      end
+
+      unless File.exist?(base_metrics_path)
+        warn "DangerComposeCompilerMetrics: reference file not found at #{base_metrics_path}. Skipping file difference report."
+        return
+      end
+
       report = `diff -u #{base_metrics_path} #{metrics_path}`
 
       markdown(
