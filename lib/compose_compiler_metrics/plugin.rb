@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'json'
-require 'csv'
+require "json"
+require "csv"
 
-require_relative './helper'
+require_relative "./helper"
 
 module Danger
   class DangerComposeCompilerMetrics < Plugin
@@ -71,7 +71,7 @@ module Danger
     end
 
     def report(metrics_dir)
-      markdown('# Compose Compiler Metrics Report')
+      markdown("# Compose Compiler Metrics Report")
       build_variants(metrics_dir).each do |module_name, build_variant|
         markdown("## #{module_name} - #{build_variant}")
 
@@ -82,7 +82,7 @@ module Danger
 
         markdown(
           folding(
-            '### Metrics',
+            "### Metrics",
             build_markdown_table(table_headers, table_rows)
           )
         )
@@ -93,7 +93,7 @@ module Danger
 
         markdown(
           folding(
-            '### Composable Stats Report',
+            "### Composable Stats Report",
             build_markdown_table(csv.headers, csv.map(&:fields))
           )
         )
@@ -102,7 +102,7 @@ module Danger
         composable_report_path = File.join(metrics_dir, composable_report_path(module_name, build_variant))
         markdown(
           folding(
-            '### Composable Report',
+            "### Composable Report",
             <<~MARKDOWN
             ```kotlin
             #{File.read(composable_report_path)}
@@ -115,7 +115,7 @@ module Danger
         class_report_path = File.join(metrics_dir, class_report_path(module_name, build_variant))
         markdown(
           folding(
-            '### Class Report',
+            "### Class Report",
             <<~MARKDOWN
             ```kotlin
             #{File.read(class_report_path)}
