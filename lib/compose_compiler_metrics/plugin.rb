@@ -10,89 +10,49 @@ module Danger
     include Helper
 
     def report_difference(metrics_dir, base_metrics_dir)
-      markdown('# Compose Compiler Metrics Difference Report')
+      markdown("# Compose Compiler Metrics Difference Report")
       build_variants(metrics_dir).each do |module_name, build_variant|
         markdown("## #{module_name} - #{build_variant}")
 
         # Metrics Report
         metrics_path = File.join(metrics_dir, metrics_filename(module_name, build_variant))
         base_metrics_path = File.join(base_metrics_dir, metrics_filename(module_name, build_variant))
-        report = `diff -u #{base_metrics_path} #{metrics_path}`
-
-        markdown(
-          folding(
-            '### Metrics',
-            if report.empty?
-              'No difference found.'
-            else
-              <<~MARKDOWN
-              ```diff
-              #{report}
-              ```
-              MARKDOWN
-            end
-          )
-        )
+        report_file_difference("Metrics", metrics_path, base_metrics_path)
 
         # Composable Stats Report
         composable_stats_report_path = File.join(metrics_dir, composable_stats_report_path(module_name, build_variant))
         base_composable_stats_report_path = File.join(base_metrics_dir, composable_stats_report_path(module_name, build_variant))
-        report = `diff -u #{base_composable_stats_report_path} #{composable_stats_report_path}`
-
-        markdown(
-          folding(
-            '### Composable Stats Report',
-            if report.empty?
-              'No difference found.'
-            else
-              <<~MARKDOWN
-              ```diff
-              #{report}
-              ```
-              MARKDOWN
-            end
-          )
-        )
+        report_file_difference("Composable Stats Report", composable_stats_report_path, base_composable_stats_report_path)
 
         # Composable Report
         composable_report_path = File.join(metrics_dir, composable_report_path(module_name, build_variant))
         base_composable_report_path = File.join(base_metrics_dir, composable_report_path(module_name, build_variant))
-        report = `diff -u #{base_composable_report_path} #{composable_report_path}`
-
-        markdown(
-          folding(
-            '### Composable Report',
-            if report.empty?
-              'No difference found.'
-            else
-              <<~MARKDOWN
-              ```diff
-              #{report}
-              ```
-              MARKDOWN
-            end
-          )
-        )
+        report_file_difference("Composable Report", composable_report_path, base_composable_report_path)
 
         # Class Report
         class_report_path = File.join(metrics_dir, class_report_path(module_name, build_variant))
         base_class_report_path = File.join(base_metrics_dir, class_report_path(module_name, build_variant))
-        report = `diff -u #{base_class_report_path} #{class_report_path}`
-        markdown(
-          folding(
-            '### Class Report',
-            if report.empty?
-              'No difference found.'
-            else
-              <<~MARKDOWN
-              ```diff
-              #{report}
-              ```
-              MARKDOWN
-            end
-          )
-        )
+        report_file_difference("Composable Report", class_report_path, base_class_report_path)
       end
+    end
+
+    def report_file_difference(title, metrics_path, base_metrics_path)
+      report = `diff -u #{base_metrics_path} #{metrics_path}`
+
+      markdown(
+        folding(
+          "### #{title}",
+          if report.empty?
+            "No difference found."
+          else
+            <<~MARKDOWN
+            ```diff
+            #{report}
+            ```
+            MARKDOWN
+          end
+        )
+      )
     end
 
     def report(metrics_dir)
