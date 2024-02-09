@@ -77,7 +77,7 @@ module Danger
 
         # Metrics Report
         metrics_path = File.join(metrics_dir, metrics_filename(module_name, build_variant))
-        table_headers = %w[name value]
+        table_headers = %w(name value)
         table_rows = JSON.load_file(metrics_path).to_a
 
         markdown(
