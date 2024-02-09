@@ -1,7 +1,7 @@
 module Helper
   def build_variants(dir)
     Dir.glob("#{dir}/*").
-      map { |s| File.basename(s).split(/[_\-]/).take(2) }.
+      map { |s| File.basename(s).split(/[_-]/).take(2) }.
       uniq
   end
 
