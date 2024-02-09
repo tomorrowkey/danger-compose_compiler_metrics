@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Helper
   def build_variants(dir)
     Dir.glob("#{dir}/*").
