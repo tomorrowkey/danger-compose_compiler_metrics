@@ -45,4 +45,8 @@ module Helper
     </details>
     HTML
   end
+
+  def installed?(command)
+    system("which #{command} > /dev/null")
+  end
 end

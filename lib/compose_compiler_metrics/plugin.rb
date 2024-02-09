@@ -10,6 +10,11 @@ module Danger
     include Helper
 
     def report_difference(metrics_dir, base_metrics_dir)
+      unless installed?("diff")
+        error "diff command not found. Please install diff command."
+        return
+      end
+
       markdown("# Compose Compiler Metrics Difference Report")
       build_variants(metrics_dir).each do |module_name, build_variant|
         markdown("## #{module_name} - #{build_variant}")
