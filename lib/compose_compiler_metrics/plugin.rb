@@ -4,6 +4,7 @@ require "json"
 require "csv"
 
 require_relative "./helper"
+require_relative "./metrics"
 
 module Danger
   class DangerComposeCompilerMetrics < Plugin
@@ -22,6 +23,41 @@ module Danger
         # Metrics Report
         metrics_path = File.join(metrics_dir, metrics_filename(module_name, build_variant))
         base_metrics_path = File.join(base_metrics_dir, metrics_filename(module_name, build_variant))
+
+        metrics = Metrics.load(metrics_path)
+        base_metrics = Metrics.load(base_metrics_path)
+
+        tables = base_metrics.grouped_metrics.map do |group_key, grouped_base_metrics|
+          grouped_metrics = metrics.grouped_metrics[group_key]
+
+          table_headers = %w(name base new diff)
+          table_rows = grouped_base_metrics.keys.map do |key|
+            new_value = grouped_metrics.send(key.to_sym)
+            base_value = grouped_base_metrics.send(key.to_sym)
+            diff_value = (new_value - base_value).then do |v|
+              next "+#{v}" if v.positive?
+
+              next v.to_s if v.negative?
+
+              ""
+            end
+
+            [key, base_value, new_value, diff_value]
+          end
+
+          [
+            "### #{group_key}",
+            build_markdown_table(table_headers, table_rows)
+          ].join("\n\n")
+        end
+
+        markdown(
+          folding(
+            "### Metrics Summary",
+            tables.join("\n\n")
+          )
+        )
+
         report_file_difference("Metrics", metrics_path, base_metrics_path)
 
         # Composable Stats Report
