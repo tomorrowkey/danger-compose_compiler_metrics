@@ -2,45 +2,377 @@
 
 require File.expand_path("spec_helper", __dir__)
 
-module Danger
-  describe Danger::DangerComposeCompilerMetrics do
-    it "should be a plugin" do
-      expect(Danger::DangerComposeCompilerMetrics.new(nil)).to be_a Danger::Plugin
+describe Danger::DangerComposeCompilerMetrics do
+  let(:dangerfile) { testing_dangerfile }
+  let(:plugin) { dangerfile.compose_compiler_metrics }
+
+  describe "#new" do
+    subject { plugin }
+
+    it { is_expected.to be_a Danger::Plugin }
+  end
+
+  describe "#report_difference" do
+    subject { plugin.report_difference(metrics_path, reference_metrics_path) }
+
+    let(:file_timestamp) { Time.new(2024, 1, 1, 0, 0, 0) }
+    let(:metrics_path) { "#{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics" }
+    let(:reference_metrics_path) { "#{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics_baseline" }
+
+    before do
+      [
+        metrics_path,
+        reference_metrics_path
+      ].each do |dir|
+        Dir.glob("#{dir}/*").each do |file|
+          FileUtils.touch(file, mtime: file_timestamp)
+        end
+      end
     end
 
-    #
-    # You should test your custom attributes and methods here
-    #
-    describe "with Dangerfile" do
-      before do
-        @dangerfile = testing_dangerfile
-        @my_plugin = @dangerfile.compose_compiler_metrics
+    let(:expect_report_list) do
+      [
+        "# Compose Compiler Metrics Difference Report",
+        "## app - debug",
+        <<~MARKDOWN,
+        <details>
+        <summary>
 
-        # mock the PR data
-        # you can then use this, eg. github.pr_author, later in the spec
-        json = File.read("#{File.dirname(__FILE__)}/support/fixtures/github_pr.json") # example json: `curl https://api.github.com/repos/danger/danger-plugin-template/pulls/18 > github_pr.json`
-        allow(@my_plugin.github).to receive(:pr_json).and_return(json)
+        ### Metrics Summary
+
+        </summary>
+
+        ### Composables
+
+        | name | reference | new | diff |
+        | --- | --- | --- | --- |
+        | skippableComposables | 5 | 6 | +1 |
+        | unskippableComposables | 3 | 1 | -2 |
+        | restartableComposables | 8 | 7 | -1 |
+        | unrestartableComposables | 0 | 0 |  |
+        | readonlyComposables | 0 | 0 |  |
+        | totalComposables | 8 | 7 | -1 |
+
+        ### Groups
+
+        | name | reference | new | diff |
+        | --- | --- | --- | --- |
+        | restartGroups | 8 | 7 | -1 |
+        | totalGroups | 11 | 7 | -4 |
+
+        ### Arguments
+
+        | name | reference | new | diff |
+        | --- | --- | --- | --- |
+        | staticArguments | 5 | 4 | -1 |
+        | certainArguments | 5 | 4 | -1 |
+        | knownStableArguments | 50 | 47 | -3 |
+        | knownUnstableArguments | 2 | 0 | -2 |
+        | unknownStableArguments | 0 | 0 |  |
+        | totalArguments | 52 | 47 | -5 |
+
+        ### Classes
+
+        | name | reference | new | diff |
+        | --- | --- | --- | --- |
+        | markedStableClasses | 0 | 0 |  |
+        | inferredStableClasses | 1 | 2 | +1 |
+        | inferredUnstableClasses | 1 | 0 | -1 |
+        | inferredUncertainClasses | 0 | 0 |  |
+        | effectivelyStableClasses | 1 | 2 | +1 |
+        | totalClasses | 2 | 2 |  |
+
+        ### Lambdas
+
+        | name | reference | new | diff |
+        | --- | --- | --- | --- |
+        | memoizedLambdas | 4 | 4 |  |
+        | singletonLambdas | 0 | 0 |  |
+        | singletonComposableLambdas | 3 | 3 |  |
+        | composableLambdas | 3 | 3 |  |
+        | totalLambdas | 5 | 4 | -1 |
+
+        </details>
+        MARKDOWN
+        <<~MARKDOWN,
+        <details>
+        <summary>
+
+        ### Metrics
+
+        </summary>
+
+        ```diff
+        --- #{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics_baseline/app_debug-module.json	#{file_timestamp.strftime('%F %T.%N %z')}
+        +++ #{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics/app_debug-module.json	#{file_timestamp.strftime('%F %T.%N %z')}
+        @@ -1,25 +1,25 @@
+         {
+        - "skippableComposables": 5,
+        - "restartableComposables": 8,
+        + "skippableComposables": 6,
+        + "restartableComposables": 7,
+          "readonlyComposables": 0,
+        - "totalComposables": 8,
+        - "restartGroups": 8,
+        - "totalGroups": 11,
+        - "staticArguments": 5,
+        - "certainArguments": 5,
+        - "knownStableArguments": 50,
+        - "knownUnstableArguments": 2,
+        + "totalComposables": 7,
+        + "restartGroups": 7,
+        + "totalGroups": 7,
+        + "staticArguments": 4,
+        + "certainArguments": 4,
+        + "knownStableArguments": 47,
+        + "knownUnstableArguments": 0,
+          "unknownStableArguments": 0,
+        - "totalArguments": 52,
+        + "totalArguments": 47,
+          "markedStableClasses": 0,
+        - "inferredStableClasses": 1,
+        - "inferredUnstableClasses": 1,
+        + "inferredStableClasses": 2,
+        + "inferredUnstableClasses": 0,
+          "inferredUncertainClasses": 0,
+        - "effectivelyStableClasses": 1,
+        + "effectivelyStableClasses": 2,
+          "totalClasses": 2,
+          "memoizedLambdas": 4,
+          "singletonLambdas": 0,
+          "singletonComposableLambdas": 3,
+          "composableLambdas": 3,
+        - "totalLambdas": 5
+        + "totalLambdas": 4
+         }
+        \\ No newline at end of file
+
+        ```
+
+
+        </details>
+        MARKDOWN
+        <<~MARKDOWN,
+        <details>
+        <summary>
+
+        ### Composable Stats Report
+
+        </summary>
+
+        ```diff
+        --- #{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics_baseline/app_debug-composables.csv	#{file_timestamp.strftime('%F %T.%N %z')}
+        +++ #{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics/app_debug-composables.csv	#{file_timestamp.strftime('%F %T.%N %z')}
+        @@ -1,5 +1,4 @@
+         package,name,composable,skippable,restartable,readonly,inline,isLambda,hasDefaults,defaultsGroup,groups,calls,
+        -com.example.android.ContactRow,ContactRow,1,0,1,0,0,0,0,0,1,2,
+        +com.example.android.ContactRow,ContactRow,1,1,1,0,0,0,0,0,1,2,
+         com.example.android.ToggleButton,ToggleButton,1,1,1,0,0,0,0,0,1,1,
+        -com.example.android.ContactDetails,ContactDetails,1,0,1,0,0,0,0,0,1,1,
+        -com.example.android.ui.theme.ExampleTheme,ExampleTheme,1,1,1,0,0,0,1,0,4,5,
+        +com.example.android.ContactDetails,ContactDetails,1,1,1,0,0,0,0,0,1,1,
+
+        ```
+
+
+        </details>
+        MARKDOWN
+        <<~MARKDOWN,
+        <details>
+        <summary>
+
+        ### Composable Report
+
+        </summary>
+
+        ```diff
+        --- #{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics_baseline/app_debug-composables.txt	#{file_timestamp.strftime('%F %T.%N %z')}
+        +++ #{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics/app_debug-composables.txt	#{file_timestamp.strftime('%F %T.%N %z')}
+        @@ -1,16 +1,11 @@
+        -restartable scheme("[androidx.compose.ui.UiComposable]") fun ContactRow(
+        -  unstable contact: Contact
+        +restartable skippable scheme("[androidx.compose.ui.UiComposable]") fun ContactRow(
+        +  stable contact: Contact
+           stable modifier: Modifier? = @static Companion
+         )
+         restartable skippable scheme("[androidx.compose.ui.UiComposable]") fun ToggleButton(
+           stable selected: Boolean
+           stable onToggled: Function1<Boolean, Unit>
+         )
+        -restartable scheme("[androidx.compose.ui.UiComposable]") fun ContactDetails(
+        -  unstable contact: Contact
+        -)
+        -restartable skippable scheme("[0, [0]]") fun ExampleTheme(
+        -  stable darkTheme: Boolean = @dynamic isSystemInDarkTheme($composer, 0)
+        -  stable dynamicColor: Boolean = @static true
+        -  stable content: Function2<Composer, Int, Unit>
+        +restartable skippable scheme("[androidx.compose.ui.UiComposable]") fun ContactDetails(
+        +  stable contact: Contact
+         )
+
+        ```
+
+
+        </details>
+        MARKDOWN
+        <<~MARKDOWN
+        <details>
+        <summary>
+
+        ### Composable Report
+
+        </summary>
+
+        ```diff
+        --- #{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics_baseline/app_debug-classes.txt	#{file_timestamp.strftime('%F %T.%N %z')}
+        +++ #{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics/app_debug-classes.txt	#{file_timestamp.strftime('%F %T.%N %z')}
+        @@ -1,8 +1,8 @@
+         stable class MainActivity {
+           <runtime stability> = Stable
+         }
+        -unstable class Contact {
+        -  stable var name: String
+        +stable class Contact {
+        +  stable val name: String
+           stable val number: String
+        -  <runtime stability> = Unstable
+        +  <runtime stability> = Stable
+         }
+
+        ```
+
+
+        </details>
+        MARKDOWN
+      ]
+    end
+
+    it "output markdown summary" do
+      subject
+
+      dangerfile.status_report[:markdowns].map(&:message).each_with_index do |message, index|
+        expect(message).to eq(expect_report_list[index])
       end
+    end
+  end
 
-      # Some examples for writing tests
-      # You should replace these with your own.
+  describe "#report" do
+    subject { plugin.report(metrics_path) }
 
-      xit "Warns on a monday" do
-        monday_date = Date.parse("2016-07-11")
-        allow(Date).to receive(:today).and_return monday_date
+    let(:metrics_path) { "#{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics" }
+    let(:expect_report_list) do
+      [
+        "# Compose Compiler Metrics Report",
+        "## app - debug",
+        <<~MARKDOWN,
+        <details>
+        <summary>
 
-        @my_plugin.warn_on_mondays
+        ### Metrics
 
-        expect(@dangerfile.status_report[:warnings]).to eq(["Trying to merge code on a Monday"])
-      end
+        </summary>
 
-      xit "Does nothing on a tuesday" do
-        monday_date = Date.parse("2016-07-12")
-        allow(Date).to receive(:today).and_return monday_date
+        | name | value |
+        | --- | --- |
+        | skippableComposables | 6 |
+        | restartableComposables | 7 |
+        | readonlyComposables | 0 |
+        | totalComposables | 7 |
+        | restartGroups | 7 |
+        | totalGroups | 7 |
+        | staticArguments | 4 |
+        | certainArguments | 4 |
+        | knownStableArguments | 47 |
+        | knownUnstableArguments | 0 |
+        | unknownStableArguments | 0 |
+        | totalArguments | 47 |
+        | markedStableClasses | 0 |
+        | inferredStableClasses | 2 |
+        | inferredUnstableClasses | 0 |
+        | inferredUncertainClasses | 0 |
+        | effectivelyStableClasses | 2 |
+        | totalClasses | 2 |
+        | memoizedLambdas | 4 |
+        | singletonLambdas | 0 |
+        | singletonComposableLambdas | 3 |
+        | composableLambdas | 3 |
+        | totalLambdas | 4 |
 
-        @my_plugin.warn_on_mondays
+        </details>
+        MARKDOWN
+        <<~MARKDOWN,
+        <details>
+        <summary>
 
-        expect(@dangerfile.status_report[:warnings]).to eq([])
+        ### Composable Stats Report
+
+        </summary>
+
+        | package | name | composable | skippable | restartable | readonly | inline | isLambda | hasDefaults | defaultsGroup | groups | calls |  |
+        | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+        | com.example.android.ContactRow | ContactRow | 1 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 1 | 2 |  |
+        | com.example.android.ToggleButton | ToggleButton | 1 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 1 | 1 |  |
+        | com.example.android.ContactDetails | ContactDetails | 1 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 1 | 1 |  |
+
+        </details>
+        MARKDOWN
+        <<~MARKDOWN,
+        <details>
+        <summary>
+
+        ### Composable Report
+
+        </summary>
+
+        ```kotlin
+        restartable skippable scheme("[androidx.compose.ui.UiComposable]") fun ContactRow(
+          stable contact: Contact
+          stable modifier: Modifier? = @static Companion
+        )
+        restartable skippable scheme("[androidx.compose.ui.UiComposable]") fun ToggleButton(
+          stable selected: Boolean
+          stable onToggled: Function1<Boolean, Unit>
+        )
+        restartable skippable scheme("[androidx.compose.ui.UiComposable]") fun ContactDetails(
+          stable contact: Contact
+        )
+
+        ```
+
+
+        </details>
+        MARKDOWN
+        <<~MARKDOWN
+        <details>
+        <summary>
+
+        ### Class Report
+
+        </summary>
+
+        ```kotlin
+        stable class MainActivity {
+          <runtime stability> = Stable
+        }
+        stable class Contact {
+          stable val name: String
+          stable val number: String
+          <runtime stability> = Stable
+        }
+
+        ```
+
+
+        </details>
+        MARKDOWN
+      ]
+    end
+
+    it "output markdown summary" do
+      subject
+
+      dangerfile.status_report[:markdowns].map(&:message).each_with_index do |message, index|
+        expect(message).to eq(expect_report_list[index])
       end
     end
   end

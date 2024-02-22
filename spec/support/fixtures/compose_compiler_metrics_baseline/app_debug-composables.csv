@@ -1,0 +1,5 @@
+package,name,composable,skippable,restartable,readonly,inline,isLambda,hasDefaults,defaultsGroup,groups,calls,
+com.example.android.ContactRow,ContactRow,1,0,1,0,0,0,0,0,1,2,
+com.example.android.ToggleButton,ToggleButton,1,1,1,0,0,0,0,0,1,1,
+com.example.android.ContactDetails,ContactDetails,1,0,1,0,0,0,0,0,1,1,
+com.example.android.ui.theme.ExampleTheme,ExampleTheme,1,1,1,0,0,0,1,0,4,5,

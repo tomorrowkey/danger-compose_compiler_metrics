@@ -1,0 +1,8 @@
+stable class MainActivity {
+  <runtime stability> = Stable
+}
+stable class Contact {
+  stable val name: String
+  stable val number: String
+  <runtime stability> = Stable
+}

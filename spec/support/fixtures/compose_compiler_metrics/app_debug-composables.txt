@@ -1,0 +1,11 @@
+restartable skippable scheme("[androidx.compose.ui.UiComposable]") fun ContactRow(
+  stable contact: Contact
+  stable modifier: Modifier? = @static Companion
+)
+restartable skippable scheme("[androidx.compose.ui.UiComposable]") fun ToggleButton(
+  stable selected: Boolean
+  stable onToggled: Function1<Boolean, Unit>
+)
+restartable skippable scheme("[androidx.compose.ui.UiComposable]") fun ContactDetails(
+  stable contact: Contact
+)
