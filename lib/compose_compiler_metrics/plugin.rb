@@ -10,7 +10,7 @@ module Danger
   class DangerComposeCompilerMetrics < Plugin
     include Helper
 
-    def report_difference(metrics_dir, base_metrics_dir)
+    def report_difference(metrics_dir, reference_metrics_dir)
       unless installed?("diff")
         error "diff command not found. Please install diff command."
         return
@@ -22,19 +22,19 @@ module Danger
 
         # Metrics Report
         metrics_path = File.join(metrics_dir, metrics_filename(module_name, build_variant))
-        base_metrics_path = File.join(base_metrics_dir, metrics_filename(module_name, build_variant))
+        reference_metrics_path = File.join(reference_metrics_dir, metrics_filename(module_name, build_variant))
 
         metrics = Metrics.load(metrics_path)
-        base_metrics = Metrics.load(base_metrics_path)
+        reference_metrics = Metrics.load(reference_metrics_path)
 
-        tables = base_metrics.grouped_metrics.map do |group_key, grouped_base_metrics|
+        tables = reference_metrics.grouped_metrics.map do |group_key, grouped_reference_metrics|
           grouped_metrics = metrics.grouped_metrics[group_key]
 
-          table_headers = %w(name base new diff)
-          table_rows = grouped_base_metrics.keys.map do |key|
+          table_headers = %w(name reference new diff)
+          table_rows = grouped_reference_metrics.keys.map do |key|
             new_value = grouped_metrics.send(key.to_sym)
-            base_value = grouped_base_metrics.send(key.to_sym)
-            diff_value = (new_value - base_value).then do |v|
+            reference_value = grouped_reference_metrics.send(key.to_sym)
+            diff_value = (new_value - reference_value).then do |v|
               next "+#{v}" if v.positive?
 
               next v.to_s if v.negative?
@@ -42,7 +42,7 @@ module Danger
               ""
             end
 
-            [key, base_value, new_value, diff_value]
+            [key, reference_value, new_value, diff_value]
           end
 
           [
@@ -58,37 +58,37 @@ module Danger
           )
         )
 
-        report_file_difference("Metrics", metrics_path, base_metrics_path)
+        report_file_difference("Metrics", metrics_path, reference_metrics_path)
 
         # Composable Stats Report
         composable_stats_report_path = File.join(metrics_dir, composable_stats_report_path(module_name, build_variant))
-        base_composable_stats_report_path = File.join(base_metrics_dir, composable_stats_report_path(module_name, build_variant))
-        report_file_difference("Composable Stats Report", composable_stats_report_path, base_composable_stats_report_path)
+        reference_composable_stats_report_path = File.join(reference_metrics_dir, composable_stats_report_path(module_name, build_variant))
+        report_file_difference("Composable Stats Report", composable_stats_report_path, reference_composable_stats_report_path)
 
         # Composable Report
         composable_report_path = File.join(metrics_dir, composable_report_path(module_name, build_variant))
-        base_composable_report_path = File.join(base_metrics_dir, composable_report_path(module_name, build_variant))
-        report_file_difference("Composable Report", composable_report_path, base_composable_report_path)
+        reference_composable_report_path = File.join(reference_metrics_dir, composable_report_path(module_name, build_variant))
+        report_file_difference("Composable Report", composable_report_path, reference_composable_report_path)
 
         # Class Report
         class_report_path = File.join(metrics_dir, class_report_path(module_name, build_variant))
-        base_class_report_path = File.join(base_metrics_dir, class_report_path(module_name, build_variant))
-        report_file_difference("Composable Report", class_report_path, base_class_report_path)
+        reference_class_report_path = File.join(reference_metrics_dir, class_report_path(module_name, build_variant))
+        report_file_difference("Composable Report", class_report_path, reference_class_report_path)
       end
     end
 
-    def report_file_difference(title, metrics_path, base_metrics_path)
+    def report_file_difference(title, metrics_path, reference_metrics_path)
       unless File.exist?(metrics_path)
         warn "DangerComposeCompilerMetrics: new file not found at #{metrics_path}. Skipping file difference report."
         return
       end
 
-      unless File.exist?(base_metrics_path)
-        warn "DangerComposeCompilerMetrics: reference file not found at #{base_metrics_path}. Skipping file difference report."
+      unless File.exist?(reference_metrics_path)
+        warn "DangerComposeCompilerMetrics: reference file not found at #{reference_metrics_path}. Skipping file difference report."
         return
       end
 
-      report = `diff -u #{base_metrics_path} #{metrics_path}`
+      report = `diff -u #{reference_metrics_path} #{metrics_path}`
 
       markdown(
         folding(
