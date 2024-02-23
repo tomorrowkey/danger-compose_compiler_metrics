@@ -40,7 +40,7 @@ module Danger
         # Class Report
         class_report_path = File.join(metrics_dir, class_report_path(module_name, build_variant))
         reference_class_report_path = File.join(reference_metrics_dir, class_report_path(module_name, build_variant))
-        report_file_difference("Composable Report", class_report_path, reference_class_report_path)
+        report_file_difference("Class Report", class_report_path, reference_class_report_path)
       end
     end
 

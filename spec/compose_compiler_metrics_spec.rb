@@ -219,7 +219,7 @@ describe Danger::DangerComposeCompilerMetrics do
         <details>
         <summary>
 
-        ### Composable Report
+        ### Class Report
 
         </summary>
 
