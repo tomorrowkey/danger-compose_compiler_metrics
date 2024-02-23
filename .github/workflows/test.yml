@@ -1,0 +1,47 @@
+name: test
+on: [push]
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    container:
+      image: ruby:3.0
+      options: --user 1001
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Restore gem cache
+        uses: actions/cache/restore@v4
+        with:
+          key: ${{ runner.os }}-gem-${{ hashFiles('**/Gemfile.lock') }}
+          path: |
+            vendor/bundle
+          restore-keys: |
+            ${{ runner.os }}-gem-${{ hashFiles('**/Gemfile.lock') }}
+            ${{ runner.os }}-gem-
+            ${{ runner.os }}-
+
+      - name: Bundle install
+        run: |
+          bundle config set path 'vendor/bundle'
+          bundle config set clean 'true'
+          bundle install --jobs 4 --retry 3
+
+      - name: Save gem cache
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            vendor/bundle
+          key: ${{ runner.os }}-gem-${{ hashFiles('**/Gemfile.lock') }}
+
+      - name: Run rubocop
+        run: bundle exec rubocop
+
+      - name: Run rspec
+        run: bundle exec rspec
