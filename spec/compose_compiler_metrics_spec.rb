@@ -42,7 +42,7 @@ describe Danger::DangerComposeCompilerMetrics do
 
         </summary>
 
-        ### Composables
+        #### Composables
 
         | name | reference | new | diff |
         | --- | --- | --- | --- |
@@ -53,14 +53,14 @@ describe Danger::DangerComposeCompilerMetrics do
         | readonlyComposables | 0 | 0 |  |
         | totalComposables | 8 | 7 | -1 |
 
-        ### Groups
+        #### Groups
 
         | name | reference | new | diff |
         | --- | --- | --- | --- |
         | restartGroups | 8 | 7 | -1 |
         | totalGroups | 11 | 7 | -4 |
 
-        ### Arguments
+        #### Arguments
 
         | name | reference | new | diff |
         | --- | --- | --- | --- |
@@ -71,7 +71,7 @@ describe Danger::DangerComposeCompilerMetrics do
         | unknownStableArguments | 0 | 0 |  |
         | totalArguments | 52 | 47 | -5 |
 
-        ### Classes
+        #### Classes
 
         | name | reference | new | diff |
         | --- | --- | --- | --- |
@@ -82,7 +82,7 @@ describe Danger::DangerComposeCompilerMetrics do
         | effectivelyStableClasses | 1 | 2 | +1 |
         | totalClasses | 2 | 2 |  |
 
-        ### Lambdas
+        #### Lambdas
 
         | name | reference | new | diff |
         | --- | --- | --- | --- |

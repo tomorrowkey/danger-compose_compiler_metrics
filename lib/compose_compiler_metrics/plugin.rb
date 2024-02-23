@@ -77,7 +77,7 @@ module Danger
         end
 
         [
-          "### #{group_key}",
+          "#### #{group_key}",
           build_markdown_table(table_headers, table_rows)
         ].join("\n\n")
       end
