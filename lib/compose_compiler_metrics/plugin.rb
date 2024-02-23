@@ -24,40 +24,7 @@ module Danger
         metrics_path = File.join(metrics_dir, metrics_filename(module_name, build_variant))
         reference_metrics_path = File.join(reference_metrics_dir, metrics_filename(module_name, build_variant))
 
-        metrics = Metrics.load(metrics_path)
-        reference_metrics = Metrics.load(reference_metrics_path)
-
-        tables = reference_metrics.grouped_metrics.map do |group_key, grouped_reference_metrics|
-          grouped_metrics = metrics.grouped_metrics[group_key]
-
-          table_headers = %w(name reference new diff)
-          table_rows = grouped_reference_metrics.keys.map do |key|
-            new_value = grouped_metrics.send(key.to_sym)
-            reference_value = grouped_reference_metrics.send(key.to_sym)
-            diff_value = (new_value - reference_value).then do |v|
-              next "+#{v}" if v.positive?
-
-              next v.to_s if v.negative?
-
-              ""
-            end
-
-            [key, reference_value, new_value, diff_value]
-          end
-
-          [
-            "### #{group_key}",
-            build_markdown_table(table_headers, table_rows)
-          ].join("\n\n")
-        end
-
-        markdown(
-          folding(
-            "### Metrics Summary",
-            tables.join("\n\n")
-          )
-        )
-
+        report_metrics_report("Metrics Summary", metrics_path, reference_metrics_path)
         report_file_difference("Metrics", metrics_path, reference_metrics_path)
 
         # Composable Stats Report
@@ -75,6 +42,52 @@ module Danger
         reference_class_report_path = File.join(reference_metrics_dir, class_report_path(module_name, build_variant))
         report_file_difference("Composable Report", class_report_path, reference_class_report_path)
       end
+    end
+
+    def report_metrics_report(title, metrics_path, reference_metrics_path)
+      unless File.exist?(metrics_path)
+        warn "DangerComposeCompilerMetrics: new file not found at #{metrics_path}. Skipping file difference report."
+        return
+      end
+
+      unless File.exist?(reference_metrics_path)
+        warn "DangerComposeCompilerMetrics: reference file not found at #{reference_metrics_path}. Skipping file difference report."
+        return
+      end
+
+      metrics = Metrics.load(metrics_path)
+      reference_metrics = Metrics.load(reference_metrics_path)
+
+      tables = reference_metrics.grouped_metrics.map do |group_key, grouped_reference_metrics|
+        grouped_metrics = metrics.grouped_metrics[group_key]
+
+        table_headers = %w(name reference new diff)
+        table_rows = grouped_reference_metrics.keys.map do |key|
+          new_value = grouped_metrics.send(key.to_sym)
+          reference_value = grouped_reference_metrics.send(key.to_sym)
+          diff_value = (new_value - reference_value).then do |v|
+            next "+#{v}" if v.positive?
+
+            next v.to_s if v.negative?
+
+            ""
+          end
+
+          [key, reference_value, new_value, diff_value]
+        end
+
+        [
+          "### #{group_key}",
+          build_markdown_table(table_headers, table_rows)
+        ].join("\n\n")
+      end
+
+      markdown(
+        folding(
+          "### #{title}",
+          tables.join("\n\n")
+        )
+      )
     end
 
     def report_file_difference(title, metrics_path, reference_metrics_path)

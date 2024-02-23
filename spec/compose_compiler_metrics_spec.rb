@@ -270,6 +270,26 @@ describe Danger::DangerComposeCompilerMetrics do
         )
       end
     end
+
+    context "when missing reference metrics file" do
+      let(:reference_metrics_path) { "#{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics_missing" }
+
+      it do
+        within_block_is_expected.to change {
+          dangerfile.status_report[:warnings]
+        }.from(
+          be_empty
+        ).to(
+          [
+            "DangerComposeCompilerMetrics: reference file not found at #{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics_missing/app_debug-module.json. Skipping file difference report.",
+            "DangerComposeCompilerMetrics: reference file not found at #{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics_missing/app_debug-module.json. Skipping file difference report.",
+            "DangerComposeCompilerMetrics: reference file not found at #{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics_missing/app_debug-composables.csv. Skipping file difference report.",
+            "DangerComposeCompilerMetrics: reference file not found at #{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics_missing/app_debug-composables.txt. Skipping file difference report.",
+            "DangerComposeCompilerMetrics: reference file not found at #{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics_missing/app_debug-classes.txt. Skipping file difference report."
+          ]
+        )
+      end
+    end
   end
 
   describe "#report" do
