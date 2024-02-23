@@ -3,7 +3,7 @@
 # If you don't like these settings, just delete this file :)
 
 AllCops:
-  TargetRubyVersion: 2.7
+  TargetRubyVersion: 3.0
 
 Style/StringLiterals:
   EnforcedStyle: double_quotes
