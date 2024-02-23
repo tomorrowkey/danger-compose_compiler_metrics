@@ -12,7 +12,7 @@ module Danger
 
     def report_difference(metrics_dir, reference_metrics_dir)
       unless installed?("diff")
-        error "diff command not found. Please install diff command."
+        failure "diff command not found. Please install diff command."
         return
       end
 

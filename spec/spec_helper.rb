@@ -17,11 +17,18 @@ if `git remote -v` == ""
   exit(0)
 end
 
+module WithinBlockIsExpected
+  def within_block_is_expected
+    expect { subject }
+  end
+end
+
 # Use coloured output, it's the best.
 RSpec.configure do |config|
   config.filter_gems_from_backtrace "bundler"
   config.color = true
   config.tty = true
+  config.include WithinBlockIsExpected
 end
 
 require "danger_plugin"

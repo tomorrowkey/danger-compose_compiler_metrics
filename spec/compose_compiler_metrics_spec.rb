@@ -254,6 +254,22 @@ describe Danger::DangerComposeCompilerMetrics do
         expect(message).to eq(expect_report_list[index])
       end
     end
+
+    context "when missing diff command" do
+      before do
+        allow_any_instance_of(Helper).to receive(:installed?).with("diff").and_return(false)
+      end
+
+      it do
+        within_block_is_expected.to change {
+          dangerfile.status_report[:errors]
+        }.from(
+          be_empty
+        ).to(
+          ["diff command not found. Please install diff command."]
+        )
+      end
+    end
   end
 
   describe "#report" do
