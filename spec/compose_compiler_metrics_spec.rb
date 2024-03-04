@@ -13,11 +13,12 @@ describe Danger::DangerComposeCompilerMetrics do
   end
 
   describe "#report_difference" do
-    subject { plugin.report_difference(metrics_path, reference_metrics_path) }
+    subject { plugin.report_difference(metrics_path, reference_metrics_path, options) }
 
     let(:file_timestamp) { Time.new(2024, 1, 1, 0, 0, 0) }
     let(:metrics_path) { "#{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics" }
     let(:reference_metrics_path) { "#{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics_baseline" }
+    let(:options) { {} }
 
     before do
       [
@@ -35,7 +36,7 @@ describe Danger::DangerComposeCompilerMetrics do
         "# Compose Compiler Metrics Difference Report",
         "## app - debug",
         <<~MARKDOWN,
-        <details>
+        <details >
         <summary>
 
         ### Metrics Summary
@@ -95,7 +96,7 @@ describe Danger::DangerComposeCompilerMetrics do
         </details>
         MARKDOWN
         <<~MARKDOWN,
-        <details>
+        <details >
         <summary>
 
         ### Metrics
@@ -153,7 +154,7 @@ describe Danger::DangerComposeCompilerMetrics do
         </details>
         MARKDOWN
         <<~MARKDOWN,
-        <details>
+        <details >
         <summary>
 
         ### Composable Stats Report
@@ -178,7 +179,7 @@ describe Danger::DangerComposeCompilerMetrics do
         </details>
         MARKDOWN
         <<~MARKDOWN,
-        <details>
+        <details >
         <summary>
 
         ### Composable Report
@@ -216,7 +217,7 @@ describe Danger::DangerComposeCompilerMetrics do
         </details>
         MARKDOWN
         <<~MARKDOWN
-        <details>
+        <details >
         <summary>
 
         ### Class Report
@@ -290,18 +291,45 @@ describe Danger::DangerComposeCompilerMetrics do
         )
       end
     end
+
+    context "when metrics option is disabled" do
+      let(:options) { { metrics: :disabled } }
+
+      it do
+        within_block_is_expected.to change {
+          dangerfile.status_report[:markdowns].map(&:message)
+        }.from(
+          be_empty
+        ).to(
+          expect_report_list.reject.with_index { |_, i| i == 3 }
+        )
+      end
+    end
+
+    context "when metrics option is open" do
+      let(:options) { { metrics: :open } }
+
+      it do
+        subject
+
+        expect(dangerfile.status_report[:markdowns][3].message).to eq(
+          expect_report_list[3].gsub("<details >", "<details open>")
+        )
+      end
+    end
   end
 
   describe "#report" do
-    subject { plugin.report(metrics_path) }
+    subject { plugin.report(metrics_path, options) }
 
     let(:metrics_path) { "#{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics" }
+    let(:options) { {} }
     let(:expect_report_list) do
       [
         "# Compose Compiler Metrics Report",
         "## app - debug",
         <<~MARKDOWN,
-        <details>
+        <details >
         <summary>
 
         ### Metrics
@@ -337,7 +365,7 @@ describe Danger::DangerComposeCompilerMetrics do
         </details>
         MARKDOWN
         <<~MARKDOWN,
-        <details>
+        <details >
         <summary>
 
         ### Composable Stats Report
@@ -353,7 +381,7 @@ describe Danger::DangerComposeCompilerMetrics do
         </details>
         MARKDOWN
         <<~MARKDOWN,
-        <details>
+        <details >
         <summary>
 
         ### Composable Report
@@ -379,7 +407,7 @@ describe Danger::DangerComposeCompilerMetrics do
         </details>
         MARKDOWN
         <<~MARKDOWN
-        <details>
+        <details >
         <summary>
 
         ### Class Report
@@ -404,11 +432,39 @@ describe Danger::DangerComposeCompilerMetrics do
       ]
     end
 
-    it "output markdown summary" do
-      subject
+    it do
+      within_block_is_expected.to change {
+        dangerfile.status_report[:markdowns].map(&:message)
+      }.from(
+        be_empty
+      ).to(
+        expect_report_list
+      )
+    end
 
-      dangerfile.status_report[:markdowns].map(&:message).each_with_index do |message, index|
-        expect(message).to eq(expect_report_list[index])
+    context "when metrics option is disabled" do
+      let(:options) { { metrics: :disabled } }
+
+      it do
+        within_block_is_expected.to change {
+          dangerfile.status_report[:markdowns].map(&:message)
+        }.from(
+          be_empty
+        ).to(
+          expect_report_list.reject.with_index { |_, i| i == 2 }
+        )
+      end
+    end
+
+    context "when metrics option is open" do
+      let(:options) { { metrics: :open } }
+
+      it do
+        subject
+
+        expect(dangerfile.status_report[:markdowns][2].message).to eq(
+          expect_report_list[2].gsub("<details >", "<details open>")
+        )
       end
     end
   end

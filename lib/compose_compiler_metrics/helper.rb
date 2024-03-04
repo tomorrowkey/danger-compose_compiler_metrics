@@ -33,9 +33,11 @@ module Helper
     end.join("\n")
   end
 
-  def folding(summary, details)
+  def folding(summary, details, open)
+    open_attribute = open == :open ? "open" : ""
+
     <<~HTML
-    <details>
+    <details #{open_attribute}>
     <summary>
 
     #{summary}
