@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    danger-compose_compiler_metrics (0.0.3)
+    danger-compose_compiler_metrics (0.0.4)
       csv
       danger-plugin-api (~> 1.0)
       json
