@@ -1,15 +1,41 @@
-# danger-compose_compiler_metrics
+danger-compose_compiler_metrics
+===
 
-A description of danger-compose_compiler_metrics.
+A [danger](https://github.com/danger/danger) plugin for reporting [compose compiler metrics](https://github.com/androidx/androidx/blob/androidx-main/compose/compiler/design/compiler-metrics.md)
 
-## Installation
+# Installation
 
-    $ gem install danger-compose_compiler_metrics
+```shell
+gem install danger-compose_compiler_metrics
+```
 
-## Usage
+# Usage
 
-    Methods and attributes from this plugin are available in
-    your `Dangerfile` under the `compose_compiler_metrics` namespace.
+## Reporting difference of compose compiler metrics
+
+```ruby
+Dir.glob('**/compose_compiler_metrics').each do |report_dir|
+  next if report_dir.include?("vendor/bundle")
+
+  compose_compiler_metrics.report_difference(report_dir, "#{report_dir}_baseline")
+end
+
+```
+
+I recommend a use case that compare the metrics report in the feature branch with the metrics report in the main branch.
+Following is example of implementation using Github Actions.
+
+https://github.com/tomorrowkey/danger-compose_compiler_metrics-example/pull/1
+
+## Reporting compose compiler metrics 
+
+```ruby
+Dir.glob('**/compose_compiler_metrics').each do |report_dir|
+  next if report_dir.include?("vendor/bundle")
+
+  compose_compiler_metrics.report(report_dir)
+end
+```
 
 ## Development
 
