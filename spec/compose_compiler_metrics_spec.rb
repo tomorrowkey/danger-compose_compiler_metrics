@@ -343,7 +343,7 @@ describe Danger::DangerComposeCompilerMetrics do
             "DangerComposeCompilerMetrics: new file not found at #{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics/app_release-module.json. Skipping file difference report.",
             "DangerComposeCompilerMetrics: new file not found at #{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics/app_release-composables.csv. Skipping file difference report.",
             "DangerComposeCompilerMetrics: new file not found at #{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics/app_release-composables.txt. Skipping file difference report.",
-            "DangerComposeCompilerMetrics: new file not found at #{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics/app_release-classes.txt. Skipping file difference report.",
+            "DangerComposeCompilerMetrics: new file not found at #{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics/app_release-classes.txt. Skipping file difference report."
           ]
         )
       end
