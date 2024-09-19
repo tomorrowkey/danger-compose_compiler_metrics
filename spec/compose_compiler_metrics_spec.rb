@@ -13,12 +13,13 @@ describe Danger::DangerComposeCompilerMetrics do
   end
 
   describe "#report_difference" do
-    subject { plugin.report_difference(metrics_path, reference_metrics_path, options) }
+    subject { plugin.report_difference(metrics_path, reference_metrics_path, options, build_variant_names) }
 
     let(:file_timestamp) { Time.new(2024, 1, 1, 0, 0, 0) }
     let(:metrics_path) { "#{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics" }
     let(:reference_metrics_path) { "#{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics_baseline" }
     let(:options) { {} }
+    let(:build_variant_names) { nil }
 
     before do
       [
@@ -314,6 +315,36 @@ describe Danger::DangerComposeCompilerMetrics do
 
         expect(dangerfile.status_report[:markdowns][3].message).to eq(
           expect_report_list[3].gsub("<details >", "<details open>")
+        )
+      end
+    end
+
+    context "when build_variant_names is [[app, debug]]" do
+      let(:build_variant_names) { [["app", "debug"]] }
+
+      it do
+        subject
+
+        dangerfile.status_report[:markdowns].map(&:message).each_with_index do |message, index|
+          expect(message).to eq(expect_report_list[index])
+        end
+      end
+    end
+
+    context "when build_variant_names is [[app, release]] that does not exists" do
+      let(:build_variant_names) { [["app", "release"]] }
+
+      it "reports missing report files" do
+        subject
+
+        expect(dangerfile.status_report[:warnings]).to eq(
+          [
+            "DangerComposeCompilerMetrics: new file not found at #{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics/app_release-module.json. Skipping file difference report.",
+            "DangerComposeCompilerMetrics: new file not found at #{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics/app_release-module.json. Skipping file difference report.",
+            "DangerComposeCompilerMetrics: new file not found at #{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics/app_release-composables.csv. Skipping file difference report.",
+            "DangerComposeCompilerMetrics: new file not found at #{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics/app_release-composables.txt. Skipping file difference report.",
+            "DangerComposeCompilerMetrics: new file not found at #{File.dirname(__FILE__)}/support/fixtures/compose_compiler_metrics/app_release-classes.txt. Skipping file difference report."
+          ]
         )
       end
     end

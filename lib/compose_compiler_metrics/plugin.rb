@@ -10,14 +10,16 @@ module Danger
   class DangerComposeCompilerMetrics < Plugin
     include Helper
 
-    def report_difference(metrics_dir, reference_metrics_dir, options = {})
+    def report_difference(metrics_dir, reference_metrics_dir, options = {}, build_variant_names = nil)
       unless installed?("diff")
         failure "diff command not found. Please install diff command."
         return
       end
 
+      build_variant_names ||= build_variants(metrics_dir)
+
       markdown("# Compose Compiler Metrics Difference Report")
-      build_variants(metrics_dir).each do |module_name, build_variant|
+      build_variant_names.each do |module_name, build_variant|
         markdown("## #{module_name} - #{build_variant}")
 
         # Metrics Report
